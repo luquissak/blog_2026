@@ -24,7 +24,7 @@ stop_words_pt = [
     "nas", "me", "esse", "eles", "estão", "você", "tinha", "foram", "essa", 
     "num", "nem", "suas", "meu", "minha", "numa", "pelos", "elas", "havia", 
     "seja", "qual", "será", "nós", "tenho", "lhe", "deles", "essas", "esses", 
-    "pelas", "este", "fosse", "uma", "tal", "post", "comentários", "http", "https", "são", "há", "sobre"
+    "pelas", "este", "fosse", "uma", "tal", "post", "comentários", "http", "https", "são", "há", "sobre", "porque"
 ]
 final_stopwords = set(list(STOPWORDS) + stop_words_pt)
 
