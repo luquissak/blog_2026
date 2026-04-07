@@ -22,10 +22,13 @@ py -m venv .venv
 
 1. Load env var
 ```bash
-get-content .env | foreach {
-    $name, $value = $_.split('=')
-    set-content env:\$name $value
-    echo $name $value
+# More robust way to load .env in PowerShell
+Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
+    $name, $value = $_ -split '=', 2
+    $name = $name.Trim()
+    $value = $value.Trim().Trim('"').Trim("'")
+    [System.Environment]::SetEnvironmentVariable($name, $value, "Process")
+    Write-Host "Set $name" -ForegroundColor Cyan
 }
 ```
 
@@ -45,6 +48,7 @@ gcloud config list
 .venv\scripts\activate 
 .venv\Scripts\python src\gcp\create_post_table.py
 .venv\Scripts\python src\gcp\insert_posts_into_bq.py
+jupyter notebook notebooks/blog_gemini_data_analytics.ipynb
 ```
 
 # deploy

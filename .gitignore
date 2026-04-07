@@ -1,3 +1,6 @@
+client_secrets.json
+blogger.dat
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
