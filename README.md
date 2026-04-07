@@ -44,6 +44,7 @@ gcloud config list
 ```bash
 .venv\scripts\activate 
 .venv\Scripts\python src\gcp\create_post_table.py
+.venv\Scripts\python src\gcp\insert_posts_into_bq.py
 ```
 
 # deploy
@@ -53,7 +54,7 @@ gcloud config list
 
 # references
 
-- []()
+- [posts_mar_2026](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sllm-studies!2sblog!3sposts_mar_2026)
 - []()
 - []()
 - []()

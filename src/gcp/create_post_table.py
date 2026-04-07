@@ -11,25 +11,22 @@ schema = [
     bigquery.SchemaField("post_content_html", "STRING", mode="REQUIRED"),
     bigquery.SchemaField("post_content", "STRING", mode="REQUIRED"),
     bigquery.SchemaField("post_replies", "INT64", mode="REQUIRED"),
-    bigquery.SchemaField(
-        "post_labels",
-        "STRING",
-        mode="REPEATED"),
+    bigquery.SchemaField("post_labels", "STRING", mode="REPEATED"),
 ]
 
-try:
-    table = bigquery.Table(table_id, schema=schema)
-    table = client.delete_table(table)
-    print(
-        "Deleted table {}.{}.{}".format(
-            table.project, table.dataset_id, table.table_id)
-    )
-except:
-    pass
+# 1. Cleaner deletion
+client.delete_table(table_id, not_found_ok=True)
+print(f"Deleted table {table_id} (if it existed).")
 
+# 2. Add partitioning and clustering
 table = bigquery.Table(table_id, schema=schema)
-table = client.create_table(table)
-print(
-    "Created table {}.{}.{}".format(
-        table.project, table.dataset_id, table.table_id)
+
+table.time_partitioning = bigquery.TimePartitioning(
+    type_=bigquery.TimePartitioningType.DAY,
+    field="post_date",  # Partitions the data by day based on post_date
 )
+
+table.clustering_fields = ["blog_id"] # Keeps data for the same blog physically close
+
+table = client.create_table(table)
+print(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
