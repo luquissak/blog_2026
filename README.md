@@ -43,12 +43,18 @@ gcloud auth application-default set-quota-project $Env:GCP_PROJECT_ID
 gcloud config list
 ```
 
-2. GCP scripts
+3. GCP scripts
 ```bash
 .venv\scripts\activate 
 .venv\Scripts\python src\gcp\create_post_table.py
 .venv\Scripts\python src\gcp\insert_posts_into_bq.py
 jupyter notebook notebooks/blog_gemini_data_analytics.ipynb
+```
+
+4. RAG
+```bash
+.venv\scripts\activate 
+.venv\Scripts\python src\send_posts_to_word.py
 ```
 
 # deploy
@@ -62,4 +68,3 @@ jupyter notebook notebooks/blog_gemini_data_analytics.ipynb
 - []()
 - []()
 - []()
-
