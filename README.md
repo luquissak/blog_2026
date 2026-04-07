@@ -38,7 +38,7 @@ Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEa
 gcloud auth login lquissakng@gmail.com --no-launch-browser
 gcloud config set project $Env:GCP_PROJECT_ID
 gcloud components update
-gcloud auth application-default login lquissakng@gmail.com --no-launch-browser
+gcloud auth application-default login lquissakng@gmail.com
 gcloud auth application-default set-quota-project $Env:GCP_PROJECT_ID
 gcloud config list
 ```
@@ -55,6 +55,12 @@ jupyter notebook notebooks/blog_gemini_data_analytics.ipynb
 ```bash
 .venv\scripts\activate 
 .venv\Scripts\python src\send_posts_to_word.py
+```
+
+5. Análises
+```bash
+.venv\scripts\activate 
+.venv\Scripts\python src\nuvens_filosoficas.py
 ```
 
 # deploy
