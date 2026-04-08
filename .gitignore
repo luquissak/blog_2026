@@ -1,5 +1,5 @@
 client_secrets.json
-blogger.dat
+*.dat
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

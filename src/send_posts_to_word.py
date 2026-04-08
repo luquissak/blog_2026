@@ -7,6 +7,8 @@ import docx
 from docx import Document
 import html2text
 from datetime import datetime
+from googleapiclient.discovery import build # Importação extra necessária
+from googleapiclient.http import MediaFileUpload # Importação extra necessária
 
 load_dotenv()
 BLOG_ID = os.getenv('BLOG_ID')
@@ -33,6 +35,34 @@ def add_hyperlink(paragraph, text, url):
     return hyperlink
 
 
+def upload_to_drive(service_drive, folder_name, local_path):
+    """Cria uma pasta no Drive e sobe os arquivos .docx"""
+    
+    # Criar a pasta no Drive
+    folder_metadata = {
+        'name': folder_name,
+        'mimeType': 'application/vnd.google-apps.folder'
+    }
+    folder = service_drive.files().create(body=folder_metadata, fields='id').execute()
+    folder_id = folder.get('id')
+    print(f"Pasta '{folder_name}' criada no Drive com ID: {folder_id}")
+
+    # Percorrer a pasta local e subir os arquivos
+    for filename in os.listdir(local_path):
+        if filename.endswith(".docx"):
+            print(f"Enviando: {filename}...")
+            file_metadata = {
+                'name': filename,
+                'parents': [folder_id]
+            }
+            media = MediaFileUpload(
+                os.path.join(local_path, filename),
+                mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+            service_drive.files().create(body=file_metadata, media_body=media).execute()
+    
+    return folder_id
+
 def process_post(doc, post, post_day):
     """Adiciona o conteúdo do post ao documento especificado."""
     doc.add_heading(f"{post['title']} - {post_day}", level=1)
@@ -45,18 +75,36 @@ def process_post(doc, post, post_day):
 
 
 def main(argv):
-    service, _ = sample_tools.init(
-        argv, "blogger", "v3", __doc__, __file__,
-        scope="https://www.googleapis.com/auth/blogger"
+# 1. Definimos a lista de escopos (Blogger + Drive)
+    # drive.file permite que o script acesse apenas os arquivos que ele mesmo criar
+    SCOPES = [
+        "https://www.googleapis.com/auth/blogger",
+        "https://www.googleapis.com/auth/drive.file" 
+    ]
+
+    # 2. Inicializamos o primeiro serviço e pegamos a autenticação
+    # O sample_tools cuida do login e do refresh token para ambos
+    service_blogger, flags = sample_tools.init(
+        argv,
+        "blogger",
+        "v3",
+        __doc__,
+        __file__,
+        scope=SCOPES,
     )
 
-    blogs_list = service.blogs().listByUser(userId="self").execute()
+    # 3. Criamos o serviço do Drive usando a mesma conexão (http) do Blogger
+    service_drive = build("drive", "v3", http=service_blogger._http)
+
+    print("Conectado ao Blogger e ao Google Drive!")
+
+    blogs_list = service_blogger.blogs().listByUser(userId="self").execute()
     docs = {}  # Dicionário para guardar os documentos de cada ano
     total_processed = 0
 
     for blog in blogs_list.get("items", []):
         print(f"Lendo posts de: {blog['name']}")
-        request = service.posts().list(blogId=blog["id"])
+        request = service_blogger.posts().list(blogId=blog["id"])
 
         while request is not None:
             posts_doc = request.execute()
@@ -76,7 +124,7 @@ def main(argv):
                 total_processed += 1
                 print(f"Processado: {post['title']} ({year})")
 
-            request = service.posts().list_next(request, posts_doc)
+            request = service_blogger.posts().list_next(request, posts_doc)
 
     # Salvando os arquivos (Uma única vez por ano!)
     print("\nFinalizando e salvando arquivos...")
@@ -88,6 +136,11 @@ def main(argv):
     print(
         f"\nSucesso! {total_processed} posts organizados em {len(docs)} arquivos.")
 
+    print("\n--- Iniciando sincronização com Google Drive para NotebookLM ---")
+    folder_name_drive = f"Blog_Archive_{custom_string}"
+    upload_to_drive(service_drive, folder_name_drive, str(OUTPUT_DIR))
+    
+    print("\nPronto! Agora é só conectar essa pasta no NotebookLM.")
 
 if __name__ == "__main__":
     main(sys.argv)
