@@ -7,7 +7,7 @@ def get_client():
     return genai.Client(
         vertexai=True,
         project="llm-studies",
-        location="us-central1"
+        location="us-east1"
     )
 
 def call_model(client, model_name, temp, prompt, content):
