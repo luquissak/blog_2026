@@ -11,7 +11,7 @@ import src.gcp.bq_queries as bq_queries
 
 client = bigquery.Client()
 TASK = "ner"
-MODEL_NAME = "gemini-2.0-flash-001"
+MODEL_NAME = "gemini-2.5-flash"
 TEMP = 0
 
 
@@ -57,7 +57,7 @@ def main(argv):
             modelResp.safetyRatings, modelResp.finish_reason
         )
         
-        time.sleep(2) # Com o Flash 002 e o novo SDK, pode ser bem mais rápido!
+        time.sleep(10) # Increased delay to avoid quota exhaustion
 
 if __name__ == "__main__":
     main(sys.argv)

@@ -79,10 +79,12 @@ jupyter notebook notebooks/blog_gemini_data_analytics.ipynb
 .venv\Scripts\python src\send_words_to_drive.py
 ```
 
-5. Análises
+6. Nuvens
 ```bash
 .venv\scripts\activate 
 .venv\Scripts\python src\nuvens_filosoficas.py
+.venv\Scripts\python src\wordcloud\nuvem_autores_por_ano.py
+.venv\Scripts\python src\wordcloud\gerar_nuvens_autores.py
 ```
 
 # deploy
